@@ -22,13 +22,19 @@ export const OneWaySteps: React.FC<Props> = ({ setTripType }) => {
     }
   };
 
-  const prevStep = () => setTripType("initial");
-
   const STEPS = {
     "pickup-location": (
-      <SelectPickupLocation nextStep={handleNextStep} prevStep={prevStep} />
+      <SelectPickupLocation
+        nextStep={handleNextStep}
+        prevStep={() => setTripType("initial")}
+      />
     ),
-    "add-stops": <AddStopsStep nextStep={handleNextStep} prevStep={prevStep} />,
+    "add-stops": (
+      <AddStopsStep
+        nextStep={handleNextStep}
+        prevStep={() => setStep("pickup-location")}
+      />
+    ),
   };
 
   return (

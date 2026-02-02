@@ -5,7 +5,7 @@ import {
   ComboboxOptions,
 } from "@headlessui/react";
 import { useGoogleAutocompleteMutation } from "@/store/apis/map.api";
-import { MapPin } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { clsx } from "clsx";
 
@@ -61,7 +61,8 @@ export const AddressInput = ({
 }: AddressInputProps) => {
   const [query, setQuery] = useState(value ?? "");
   const [selected, setSelected] = useState<AddressSuggestion | null>(null);
-  const [trigger, { data: apiSuggestions }] = useGoogleAutocompleteMutation();
+  const [trigger, { data: apiSuggestions, isLoading }] =
+    useGoogleAutocompleteMutation();
 
   const suggestions = useMemo(() => {
     if (!Array.isArray(apiSuggestions)) return [];
@@ -102,7 +103,8 @@ export const AddressInput = ({
     onChange?.(next, null);
   };
 
-  const showOptions = query.length >= 2 && suggestions.length > 0;
+  const showOptions =
+    query.length >= 2 && (suggestions.length > 0 || isLoading);
 
   return (
     <div className={clsx("relative", className)}>
@@ -128,12 +130,18 @@ export const AddressInput = ({
             onChange={handleInputChange}
             placeholder={placeholder}
             className={clsx(
-              "w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none",
+              "w-full pl-10 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none",
+              isLoading ? "pr-10" : "pr-4",
               error ? "border-red-500" : "border-gray-300",
               inputClassName
             )}
             autoComplete="off"
           />
+          {isLoading && (
+            <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+              <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
+            </div>
+          )}
         </div>
 
         <ComboboxOptions
@@ -145,6 +153,12 @@ export const AddressInput = ({
             optionsClassName
           )}
         >
+          {showOptions && isLoading && suggestions.length === 0 && (
+            <div className="px-3 py-4 text-sm text-gray-500 flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+              Searching...
+            </div>
+          )}
           {showOptions &&
             suggestions.map((suggestion) => (
               <ComboboxOption
