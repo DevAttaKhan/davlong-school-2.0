@@ -14,6 +14,14 @@ export const OneWaySteps: React.FC<Props> = ({ setTripType }) => {
 
   const form = useForm<LeadSchemaType>({
     resolver: zodResolver(LeadSchema),
+    defaultValues: {
+      outbound_trip: {
+        type: "OUTBOUND",
+        pickup_location: "",
+        dropoff_location: "",
+        trip_stops: [],
+      },
+    },
   });
 
   const handleNextStep = async (nextStep?: string) => {
@@ -34,6 +42,11 @@ export const OneWaySteps: React.FC<Props> = ({ setTripType }) => {
         nextStep={handleNextStep}
         prevStep={() => setStep("pickup-location")}
       />
+    ),
+    "dates-times": (
+      <div className="min-h-screen bg-[#f9fafb] p-8 text-center">
+        <p className="text-gray-600">Choose Dates & Times (coming soon)</p>
+      </div>
     ),
   };
 

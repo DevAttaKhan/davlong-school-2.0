@@ -31,6 +31,7 @@ export const TripSchema = z.object({
   dropoff_location: z
     .string()
     .min(5, { message: "Dropoff location is required" }),
+  trip_stops: z.array(TripStopSchema).optional(),
   pickup_date: z.string().optional(), // date as ISO string
   pickup_time: z.string().optional(), // time as HH:mm
   arrival_time: z.string().optional(),

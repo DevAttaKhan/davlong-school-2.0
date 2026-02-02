@@ -1,13 +1,7 @@
 "use client";
 import React from "react";
 
-import {
-  ArrowDownRightSquare,
-  ArrowRight,
-  ArrowRightIcon,
-  RefreshCw,
-  X,
-} from "lucide-react";
+import { ArrowRight, RefreshCw, X } from "lucide-react";
 import PointArrow from "@/assets/svgs/point-arrow.svg";
 
 type Props = {
