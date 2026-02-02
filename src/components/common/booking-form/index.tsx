@@ -9,8 +9,8 @@ export const BookingForm = () => {
 
   const FormStepMap = {
     initial: <SelectTripType selectTripType={setTripType} />,
-    roundtrip: <OneWaySteps />,
-    oneway: <OneWaySteps />,
+    roundtrip: <OneWaySteps setTripType={setTripType} />,
+    oneway: <OneWaySteps setTripType={setTripType} />,
   };
   return <div>{FormStepMap[tripType]}</div>;
 };

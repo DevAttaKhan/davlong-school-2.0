@@ -1,5 +1,5 @@
 import { AlarmClock, MapPinCheck, Trash2 } from "lucide-react";
-import { type OneWayStopSchemaType } from "./schema";
+import { type TripStopSchemaType } from "./schema";
 
 const AddStopEdit = ({ onRemove }: { onRemove: () => void }) => {
   return (
@@ -110,7 +110,7 @@ const AddedStopDisplay = () => {
 };
 
 type Props = {
-  stop: OneWayStopSchemaType;
+  stop: TripStopSchemaType;
   onRemove: () => void;
   index: number;
 };

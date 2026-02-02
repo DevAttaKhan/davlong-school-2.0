@@ -5,10 +5,10 @@ import { LocationField } from "../LocationField";
 import { StepProgressBar } from "../StepProgressBar";
 import { InfoBox } from "../InfoBox";
 import { CONTENT_PADDING, STEP_PROGRESS } from "../constants";
-import type { OneWayStepsSchemaType } from "./schema";
+import type { LeadSchemaType } from "./schema";
 
 type SelectPickupLocationProps = {
-  nextStep: (validationFields: string[], nextStep?: string) => void;
+  nextStep: (nextStep?: string) => void;
   prevStep: () => void;
 };
 
@@ -25,17 +25,31 @@ export const SelectPickupLocation = ({
   nextStep,
   prevStep,
 }: SelectPickupLocationProps) => {
+  "use no memo";
   const {
     setValue,
     watch,
+    trigger,
     formState: { errors },
-  } = useFormContext<OneWayStepsSchemaType>();
+  } = useFormContext<LeadSchemaType>();
 
-  const pickupLocation = watch("pickupLocation");
-  const dropoffLocation = watch("dropoffLocation");
+  const pickupLocation = watch("outbound_trip.pickup_location");
+  const dropoffLocation = watch("outbound_trip.dropoff_location");
+
+  const validateLocations = async () => {
+    const isValid = await trigger([
+      "outbound_trip.pickup_location",
+      "outbound_trip.dropoff_location",
+    ]);
+    return isValid;
+  };
 
   const handleNextStep = () => {
-    nextStep(["pickupLocation", "dropoffLocation"], "add-stops");
+    validateLocations().then((isValid) => {
+      if (isValid) {
+        nextStep("add-stops");
+      }
+    });
   };
 
   return (
@@ -96,8 +110,10 @@ export const SelectPickupLocation = ({
                 </>
               }
               value={pickupLocation}
-              onChange={(value) => setValue("pickupLocation", value)}
-              error={errors.pickupLocation?.message}
+              onChange={(value) => {
+                setValue("outbound_trip.pickup_location", value);
+              }}
+              error={errors.outbound_trip?.pickup_location?.message}
               placeholder="Enter pickup address or Eircode..."
             />
 
@@ -105,8 +121,10 @@ export const SelectPickupLocation = ({
               label="Destination"
               description="Where are you going? Type the exact address or Eircode of your destination."
               value={dropoffLocation}
-              onChange={(value) => setValue("dropoffLocation", value)}
-              error={errors.dropoffLocation?.message}
+              onChange={(value) => {
+                setValue("outbound_trip.dropoff_location", value);
+              }}
+              error={errors.outbound_trip?.dropoff_location?.message}
               placeholder="Enter destination address or Eircode..."
             />
 

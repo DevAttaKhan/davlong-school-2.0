@@ -10,14 +10,14 @@ export default defineConfig({
     tailwindcss(),
     react({
       babel: {
-        plugins: [["babel-plugin-react-compiler"]]
-      }
-    })
+        plugins: [],
+      },
+    }),
   ],
 
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src")
-    }
-  }
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
 });
