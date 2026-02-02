@@ -22,17 +22,14 @@ export const OneWaySteps = () => {
     }
   };
 
+  const prevStep = () => setStep("pickup-location");
+
   const STEPS = {
     "pickup-location": (
-      <SelectPickupLocation
-        nextStep={handleNextStep}
-        prevStep={function (): void {
-          throw new Error("Function not implemented.");
-        }}
-      />
+      <SelectPickupLocation nextStep={handleNextStep} prevStep={prevStep} />
     ),
     "add-stops": (
-      <AddStopsStep nextStep={handleNextStep} prevStep={undefined} />
+      <AddStopsStep nextStep={handleNextStep} prevStep={prevStep} />
     ),
   };
 
