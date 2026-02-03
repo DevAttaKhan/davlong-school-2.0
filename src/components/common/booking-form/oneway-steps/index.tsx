@@ -3,7 +3,7 @@ import { SelectPickupLocation } from "./SelectPickupLocation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LeadSchema, type LeadSchemaType } from "./schema";
 import { FormProvider, useForm } from "react-hook-form";
-import { AddStopsStep } from "./AddStopsStep";
+import { AddStopsStep } from "../trip-stops/AddStopsStep";
 
 type Props = {
   setTripType: (tripType: "roundtrip" | "oneway" | "initial") => void;

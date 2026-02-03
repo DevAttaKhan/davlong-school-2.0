@@ -1,7 +1,7 @@
 import { AlarmClock, MapPinCheck, Pencil, Trash2 } from "lucide-react";
 import { useFormContext, Controller } from "react-hook-form";
 import { AddressInput } from "../../AddressInput";
-import type { LeadSchemaType } from "./schema";
+import type { LeadSchemaType } from "../oneway-steps/schema";
 
 type AddStopEditProps = {
   fieldPrefix: `outbound_trip.trip_stops.${number}`;

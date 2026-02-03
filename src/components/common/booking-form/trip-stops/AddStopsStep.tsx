@@ -1,11 +1,11 @@
 import { ArrowSharpRight } from "@/assets/icons";
 import { StepHeader } from "../StepHeader";
-import { JourneyTimeline, JourneyStopDot } from "./JourneyTimeline";
+import { JourneyTimeline, JourneyStopDot } from "../oneway-steps/JourneyTimeline";
 import { StopComposer } from "./AddStopElements";
 import { AddStopButton } from "./AddStopButton";
 import { ExtraStopsInfo } from "./ExtraStopsInfo";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { type LeadSchemaType } from "./schema";
+import { type LeadSchemaType } from "../oneway-steps/schema";
 import { CONTENT_PADDING, STEP_PROGRESS } from "../constants";
 
 type AddStopsStepProps = {
