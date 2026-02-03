@@ -4,6 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { LeadSchema, type LeadSchemaType } from "./schema";
 import { FormProvider, useForm } from "react-hook-form";
 import { AddStopsStep } from "../trip-stops/AddStopsStep";
+import { DatesTimesStep } from "./DatesTimesStep";
+import { GroupDetailsStep } from "./GroupDetailsStep";
+import { ContactDetailsStep } from "./ContactDetailsStep";
+import { ReviewStep } from "./ReviewStep";
 
 type Props = {
   setTripType: (tripType: "roundtrip" | "oneway" | "initial") => void;
@@ -15,6 +19,8 @@ export const OneWaySteps: React.FC<Props> = ({ setTripType }) => {
   const form = useForm<LeadSchemaType>({
     resolver: zodResolver(LeadSchema),
     defaultValues: {
+      teachers_count: 1,
+      students_count: 1,
       outbound_trip: {
         type: "OUTBOUND",
         pickup_location: "",
@@ -44,9 +50,28 @@ export const OneWaySteps: React.FC<Props> = ({ setTripType }) => {
       />
     ),
     "dates-times": (
-      <div className="min-h-screen bg-[#f9fafb] p-8 text-center">
-        <p className="text-gray-600">Choose Dates & Times (coming soon)</p>
-      </div>
+      <DatesTimesStep
+        nextStep={handleNextStep}
+        prevStep={() => setStep("add-stops")}
+      />
+    ),
+    "group-details": (
+      <GroupDetailsStep
+        nextStep={handleNextStep}
+        prevStep={() => setStep("dates-times")}
+      />
+    ),
+    "contact-details": (
+      <ContactDetailsStep
+        nextStep={handleNextStep}
+        prevStep={() => setStep("group-details")}
+      />
+    ),
+    review: (
+      <ReviewStep 
+        prevStep={() => setStep("contact-details")} 
+        navigateToStep={setStep}
+      />
     ),
   };
 

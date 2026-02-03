@@ -1,6 +1,5 @@
 import { AlarmClock, MapPinCheck, Pencil, Trash2 } from "lucide-react";
 import { useFormContext, Controller } from "react-hook-form";
-import { useEffect, useRef } from "react";
 import { AddressInput } from "../../AddressInput";
 import type { LeadSchemaType } from "../oneway-steps/schema";
 
@@ -11,50 +10,10 @@ type AddStopEditProps = {
 };
 
 const AddStopEdit = ({ fieldPrefix, onRemove, onDone }: AddStopEditProps) => {
-  const { control, watch } = useFormContext<LeadSchemaType>();
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  // Watch the location value to check if it's filled
-  const locationValue = watch(`${fieldPrefix}.location` as const);
-
-  // Handle click outside to save - but only if location is filled and not clicking on dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
-      
-      // Check if clicking on dropdown options (Headless UI ComboboxOptions)
-      const isDropdownClick = (target as Element)?.closest?.('[role="listbox"]') || 
-                              (target as Element)?.closest?.('[role="option"]') ||
-                              (target as Element)?.closest?.('[data-headlessui-state]');
-      
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(target) &&
-        !isDropdownClick
-      ) {
-        // Only auto-save if location is filled
-        if (locationValue?.trim()) {
-          // Add a small delay to prevent immediate close when selecting from dropdown
-          setTimeout(() => {
-            onDone();
-          }, 200);
-        }
-      }
-    };
-
-    // Use a slight delay to ensure dropdown clicks are processed first
-    const timeoutId = setTimeout(() => {
-      document.addEventListener("mousedown", handleClickOutside);
-    }, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [onDone, locationValue]);
+  const { control } = useFormContext<LeadSchemaType>();
 
   return (
-    <div className="relative ml-0" data-editing-stop ref={containerRef}>
+    <div className="relative ml-0" data-editing-stop>
       <div className="bg-white border-2 border-gray-400 rounded-lg p-4 shadow-lg relative w-full min-w-0">
         <button
           type="button"
@@ -116,6 +75,16 @@ const AddStopEdit = ({ fieldPrefix, onRemove, onDone }: AddStopEditProps) => {
               )}
             />
           </div>
+        </div>
+
+        <div className="flex justify-end mt-4 pt-3 border-t border-gray-200">
+          <button
+            type="button"
+            onClick={onDone}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Done
+          </button>
         </div>
       </div>
     </div>
