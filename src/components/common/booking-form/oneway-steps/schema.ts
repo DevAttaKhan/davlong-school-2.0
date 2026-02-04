@@ -52,6 +52,7 @@ export const TripSchema = z.object({
     })
     .optional(),
   arrival_time: z.string().optional(),
+  arrival_date: z.string().optional(),
   duration: z.string().optional(),
   distance: z.number().optional(),
   created_at: z.string().datetime().optional(),

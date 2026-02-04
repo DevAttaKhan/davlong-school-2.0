@@ -14,7 +14,7 @@ type Props = {
 };
 
 export const OneWaySteps: React.FC<Props> = ({ setTripType }) => {
-  const [step, setStep] = useState("dates-times");
+  const [step, setStep] = useState("pickup-location");
 
   const form = useForm<LeadSchemaType>({
     resolver: zodResolver(LeadSchema),

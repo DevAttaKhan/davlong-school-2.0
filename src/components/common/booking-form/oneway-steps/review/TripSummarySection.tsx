@@ -7,6 +7,9 @@ type TripSummarySectionProps = {
     dropoff_location?: string;
     pickup_date?: string;
     pickup_time?: string;
+    arrival_time?: string;
+    arrival_date?: string;
+    duration?: string;
     trip_stops?: Array<{ location: string; estimated_time: number }>;
   };
   onEdit?: () => void;
@@ -116,12 +119,17 @@ export const TripSummarySection = ({
               <p className="text-sm font-medium text-gray-900">
                 {tripData?.dropoff_location || "Destination"}
               </p>
-              {tripData?.pickup_date && tripData?.pickup_time && (
+              {tripData?.arrival_date && tripData?.arrival_time ? (
+                <p className="text-xs text-gray-600 mt-1">
+                  {formatDateTime(tripData.arrival_date, tripData.arrival_time)}
+                  {tripData.duration && ` (${tripData.duration})`}
+                </p>
+              ) : tripData?.pickup_date && tripData?.pickup_time ? (
                 <p className="text-xs text-gray-600 mt-1">
                   {formatDateTime(tripData.pickup_date, tripData.pickup_time)}{" "}
                   (estimated)
                 </p>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

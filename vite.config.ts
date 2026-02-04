@@ -20,4 +20,19 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/api/google-directions": {
+        target: "https://maps.googleapis.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/google-directions/, "/maps/api"),
+        secure: true,
+        configure: (proxy, _options) => {
+          proxy.on("error", (err, _req, _res) => {
+            console.log("Proxy error:", err);
+          });
+        },
+      },
+    },
+  },
 });
