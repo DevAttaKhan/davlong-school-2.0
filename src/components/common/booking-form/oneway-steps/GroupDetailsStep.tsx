@@ -2,8 +2,8 @@ import { Users, ArrowRight } from "lucide-react";
 import { useFormContext, Controller } from "react-hook-form";
 import { StepHeader } from "../StepHeader";
 import { CONTENT_PADDING, STEP_PROGRESS } from "../constants";
-import { TeacherCountInput } from "../TeacherCountInput";
-import { StudentCountInput } from "../StudentCountInput";
+import { PassengerCountInput } from "../PassengerCountInput";
+
 import type { LeadSchemaType } from "./schema";
 
 type GroupDetailsStepProps = {
@@ -18,8 +18,7 @@ export const GroupDetailsStep = ({
   nextStep,
   prevStep,
 }: GroupDetailsStepProps) => {
-  const { control, watch, trigger } =
-    useFormContext<LeadSchemaType>();
+  const { control, watch, trigger } = useFormContext<LeadSchemaType>();
 
   const teachersCount = watch("teachers_count") ?? 0;
   const studentsCount = watch("students_count") ?? 0;
@@ -37,7 +36,10 @@ export const GroupDetailsStep = ({
   return (
     <div className="min-h-screen bg-[#f9fafb] px-2 sm:px-4">
       <div className="max-w-[982px] mx-auto bg-white rounded-lg shadow-sm p-2 sm:p-4 mt-[40px]">
-        <StepHeader progressValue={STEP_PROGRESS.GROUP_DETAILS} onBack={prevStep} />
+        <StepHeader
+          progressValue={STEP_PROGRESS.GROUP_DETAILS}
+          onBack={prevStep}
+        />
 
         <div
           className={`${CONTENT_PADDING} mt-6 sm:mt-8 md:mt-[40px] space-y-8`}
@@ -66,7 +68,7 @@ export const GroupDetailsStep = ({
                 control={control}
                 rules={{ min: 1 }}
                 render={({ field, fieldState }) => (
-                  <TeacherCountInput
+                  <PassengerCountInput
                     value={field.value ?? 1}
                     onChange={field.onChange}
                     label="Teachers"
@@ -81,7 +83,7 @@ export const GroupDetailsStep = ({
                 control={control}
                 rules={{ min: 1 }}
                 render={({ field, fieldState }) => (
-                  <StudentCountInput
+                  <PassengerCountInput
                     value={field.value ?? 1}
                     onChange={field.onChange}
                     label="Students"

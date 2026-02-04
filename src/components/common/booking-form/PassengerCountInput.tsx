@@ -1,6 +1,6 @@
 import { Minus, Plus } from "lucide-react";
 
-type StudentCountInputProps = {
+type Props = {
   value?: number;
   onChange?: (value: number) => void;
   label?: string;
@@ -8,13 +8,13 @@ type StudentCountInputProps = {
   error?: string;
 };
 
-export const StudentCountInput = ({
+export const PassengerCountInput: React.FC<Props> = ({
   value = 1,
   onChange,
-  label = "Students",
+  label = "Teachers",
   className = "",
   error,
-}: StudentCountInputProps) => {
+}) => {
   const handleIncrement = () => {
     onChange?.(value + 1);
   };
@@ -41,7 +41,7 @@ export const StudentCountInput = ({
           min={1}
           value={value}
           onChange={handleInputChange}
-          className={`w-full text-center text-lg font-semibold text-gray-900 border rounded-lg py-3 pl-12 pr-12 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
+          className={`w-full text-center text-lg font-semibold text-gray-900 border rounded-lg py-3 pl-12 pr-12 focus:ring-2 focus:ring-violet-500 focus:border-transparent outline-none ${
             error ? "border-red-500" : "border-gray-300"
           }`}
         />
@@ -61,9 +61,7 @@ export const StudentCountInput = ({
           <Plus className="w-4 h-4 text-gray-600" />
         </button>
       </div>
-      {error && (
-        <p className="text-red-500 text-xs mt-1">{error}</p>
-      )}
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 };
