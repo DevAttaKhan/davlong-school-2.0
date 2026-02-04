@@ -14,10 +14,7 @@ type DatesTimesStepProps = {
 const NEXT_BUTTON_CLASS =
   "flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-[1.5rem] hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors";
 
-export const DatesTimesStep = ({
-  nextStep,
-  prevStep,
-}: DatesTimesStepProps) => {
+export const DatesTimesStep = ({ nextStep, prevStep }: DatesTimesStepProps) => {
   const { control, watch, trigger } = useFormContext<LeadSchemaType>();
 
   const pickupLocation = watch("outbound_trip.pickup_location") ?? "";
@@ -40,7 +37,10 @@ export const DatesTimesStep = ({
   return (
     <div className="min-h-screen bg-[#f9fafb] px-2 sm:px-4">
       <div className="max-w-[982px] mx-auto bg-white rounded-lg shadow-sm p-2 sm:p-4 mt-[40px]">
-        <StepHeader progressValue={STEP_PROGRESS.DATES_TIMES} onBack={prevStep} />
+        <StepHeader
+          progressValue={STEP_PROGRESS.DATES_TIMES}
+          onBack={prevStep}
+        />
 
         <div
           className={`${CONTENT_PADDING} mt-6 sm:mt-8 md:mt-[40px] space-y-8`}
@@ -67,12 +67,12 @@ export const DatesTimesStep = ({
                 Departure date & time
               </h2>
               <p className="text-sm text-gray-600 mb-4">
-                When should we pick you up from {pickupLocation}? Choose the date
-                and time you want to start your trip.
+                When should we pick you up from {pickupLocation}? Choose the
+                date and time you want to start your trip.
               </p>
 
               {/* Date and Time Inputs */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr] gap-4 mb-4">
                 {/* Date Picker */}
                 <Controller
                   name="outbound_trip.pickup_date"

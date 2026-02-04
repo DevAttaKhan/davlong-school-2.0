@@ -17,8 +17,8 @@ export const PassengersSection = ({
     <div className="border-b border-gray-200 pb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-blue-600" />
-          <h2 className="text-lg font-semibold text-blue-600">Passengers</h2>
+          <Users className="w-5 h-5 text-violet-600" />
+          <h2 className="text-lg font-semibold text-violet-600">Passengers</h2>
         </div>
         <button
           type="button"

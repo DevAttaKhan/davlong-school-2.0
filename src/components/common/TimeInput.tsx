@@ -18,8 +18,6 @@ export const TimeInput = ({
   className = "",
   error,
 }: TimeInputProps) => {
-  const buttonRef = useRef<HTMLDivElement>(null);
-  const [buttonWidth, setButtonWidth] = useState<number | undefined>(undefined);
   const [selectedHour, setSelectedHour] = useState<number | null>(null);
   const [selectedMinute, setSelectedMinute] = useState<number | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<"AM" | "PM">("AM");
@@ -47,36 +45,21 @@ export const TimeInput = ({
     }
   }, [value]);
 
-  // Measure button width
-  useEffect(() => {
-    const updateWidth = () => {
-      if (buttonRef.current) {
-        setButtonWidth(buttonRef.current.offsetWidth);
-      }
-    };
-    // Initial measurement
-    updateWidth();
-    // Update on resize
-    window.addEventListener("resize", updateWidth);
-    // Use ResizeObserver for more accurate measurements
-    const resizeObserver = new ResizeObserver(() => {
-      updateWidth();
-    });
-    if (buttonRef.current) {
-      resizeObserver.observe(buttonRef.current);
-    }
-    return () => {
-      window.removeEventListener("resize", updateWidth);
-      resizeObserver.disconnect();
-    };
-  }, []);
-
   const hours = Array.from({ length: 12 }, (_, i) => i + 1);
   const minutes = Array.from({ length: 60 }, (_, i) => i);
 
-  const handleTimeSelect = (hour: number | null, minute: number | null, period: "AM" | "PM") => {
+  const handleTimeSelect = (
+    hour: number | null,
+    minute: number | null,
+    period: "AM" | "PM"
+  ) => {
     if (hour !== null && minute !== null) {
-      const hour24 = period === "PM" && hour !== 12 ? hour + 12 : period === "AM" && hour === 12 ? 0 : hour;
+      const hour24 =
+        period === "PM" && hour !== 12
+          ? hour + 12
+          : period === "AM" && hour === 12
+            ? 0
+            : hour;
       const timeString = `${hour24.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
       onChange?.(timeString);
     }
@@ -97,14 +80,15 @@ export const TimeInput = ({
     handleTimeSelect(selectedHour, selectedMinute, period);
   };
 
-  const displayValue = selectedHour !== null && selectedMinute !== null
-    ? `${selectedHour.toString().padStart(2, "0")}:${selectedMinute.toString().padStart(2, "0")} ${selectedPeriod}`
-    : placeholder;
+  const displayValue =
+    selectedHour !== null && selectedMinute !== null
+      ? `${selectedHour.toString().padStart(2, "0")}:${selectedMinute.toString().padStart(2, "0")} ${selectedPeriod}`
+      : placeholder;
 
   return (
     <div className={`relative ${className}`}>
       <Popover className="relative w-full">
-        <div ref={buttonRef} className="w-full">
+        <div className="w-full">
           <PopoverButton className="w-full relative text-left">
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
@@ -123,17 +107,18 @@ export const TimeInput = ({
             </div>
           </PopoverButton>
         </div>
-        {error && (
-          <p className="text-red-500 text-xs mt-1">{error}</p>
-        )}
+        {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
         <PopoverPanel
           transition
           anchor="bottom start"
-          style={{ width: buttonWidth ? `${buttonWidth}px` : undefined }}
           className="z-50 bg-white border border-gray-200 rounded-lg shadow-lg transition duration-200 ease-in-out data-closed:scale-95 data-closed:opacity-0 mt-2"
         >
           {({ close }) => {
-            const handleTimeChange = (hour: number | null, minute: number | null, period: "AM" | "PM") => {
+            const handleTimeChange = (
+              hour: number | null,
+              minute: number | null,
+              period: "AM" | "PM"
+            ) => {
               handleTimeSelect(hour, minute, period);
               // Close popover when all values are selected
               if (hour !== null && minute !== null) {
@@ -146,7 +131,9 @@ export const TimeInput = ({
                 <div className="flex gap-4 justify-center">
                   {/* Hours Column */}
                   <div className="flex flex-col items-center">
-                    <div className="text-xs text-gray-500 mb-2 font-medium">Hour</div>
+                    <div className="text-xs text-gray-500 mb-2 font-medium">
+                      Hour
+                    </div>
                     <div className="overflow-y-auto max-h-48 space-y-1">
                       {hours.map((hour) => (
                         <button
@@ -154,7 +141,11 @@ export const TimeInput = ({
                           type="button"
                           onClick={() => {
                             handleHourChange(hour);
-                            handleTimeChange(hour, selectedMinute, selectedPeriod);
+                            handleTimeChange(
+                              hour,
+                              selectedMinute,
+                              selectedPeriod
+                            );
                           }}
                           className={`w-12 h-8 flex items-center justify-center text-sm rounded border transition-colors ${
                             selectedHour === hour
@@ -170,7 +161,9 @@ export const TimeInput = ({
 
                   {/* Minutes Column */}
                   <div className="flex flex-col items-center">
-                    <div className="text-xs text-gray-500 mb-2 font-medium">Min</div>
+                    <div className="text-xs text-gray-500 mb-2 font-medium">
+                      Min
+                    </div>
                     <div className="overflow-y-auto max-h-48 space-y-1">
                       {minutes.map((minute) => (
                         <button
@@ -178,7 +171,11 @@ export const TimeInput = ({
                           type="button"
                           onClick={() => {
                             handleMinuteChange(minute);
-                            handleTimeChange(selectedHour, minute, selectedPeriod);
+                            handleTimeChange(
+                              selectedHour,
+                              minute,
+                              selectedPeriod
+                            );
                           }}
                           className={`w-12 h-8 flex items-center justify-center text-sm rounded border transition-colors ${
                             selectedMinute === minute
@@ -194,7 +191,9 @@ export const TimeInput = ({
 
                   {/* AM/PM Column */}
                   <div className="flex flex-col items-center">
-                    <div className="text-xs text-gray-500 mb-2 font-medium">Period</div>
+                    <div className="text-xs text-gray-500 mb-2 font-medium">
+                      Period
+                    </div>
                     <div className="space-y-1">
                       {(["AM", "PM"] as const).map((period) => (
                         <button
@@ -202,7 +201,11 @@ export const TimeInput = ({
                           type="button"
                           onClick={() => {
                             handlePeriodChange(period);
-                            handleTimeChange(selectedHour, selectedMinute, period);
+                            handleTimeChange(
+                              selectedHour,
+                              selectedMinute,
+                              period
+                            );
                           }}
                           className={`w-12 h-8 flex items-center justify-center text-sm rounded border transition-colors ${
                             selectedPeriod === period

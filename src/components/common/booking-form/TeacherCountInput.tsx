@@ -41,7 +41,7 @@ export const TeacherCountInput = ({
           min={1}
           value={value}
           onChange={handleInputChange}
-          className={`w-full text-center text-lg font-semibold text-gray-900 border rounded-lg py-3 pl-12 pr-12 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none ${
+          className={`w-full text-center text-lg font-semibold text-gray-900 border rounded-lg py-3 pl-12 pr-12 focus:ring-2 focus:ring-violet-500 focus:border-transparent outline-none ${
             error ? "border-red-500" : "border-gray-300"
           }`}
         />
