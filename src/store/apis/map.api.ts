@@ -5,9 +5,9 @@ import type { GooglePlacesAutocompleteResponse } from "@/types/googlePlaces.inte
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY!;
 
-// Bus factor multiplier: Buses are typically 20-40% slower than cars
-// This accounts for slower acceleration, larger size, and bus-specific considerations
-// Default: 1.3x (30% slower) - can be adjusted via environment variable
+// Bus factor multiplier: Buses are typically ~45–50% slower than car driving times
+// (closer to Google Maps public transit times). Applied to travel time for both one-way and return.
+// Default: 1.45; set VITE_BUS_FACTOR to override (e.g. 1.2 for 20% slower, 1.5 for 50% slower).
 const BUS_FACTOR = parseFloat(import.meta.env.VITE_BUS_FACTOR || "1.2");
 
 // Types for DateTime API (Directions API)
@@ -137,7 +137,6 @@ export const mapApi = createApi({
         });
 
         if (departureTime) {
-          // Convert ISO 8601 to Unix timestamp for Directions API
           const timestamp = Math.floor(new Date(departureTime).getTime() / 1000);
           params.append("departure_time", timestamp.toString());
         }
@@ -146,7 +145,6 @@ export const mapApi = createApi({
           params.append("waypoints", waypoints.join("|"));
         }
 
-        // Use proxy in dev, direct URL in production
         const url = import.meta.env.DEV
           ? `/api/google-directions/directions/json?${params.toString()}`
           : `https://maps.googleapis.com/maps/api/directions/json?${params.toString()}`;
@@ -218,9 +216,13 @@ export const mapApi = createApi({
           departureDateTime.getTime() + totalDurationSeconds * 1000
         );
 
-        // Format arrival time
-        const arrivalTime = arrivalDateTime.toTimeString().slice(0, 5); // HH:mm format
-        const arrivalDate = arrivalDateTime.toISOString().split("T")[0]; // YYYY-MM-DD format
+        // Format arrival in local time so date and time stay consistent (avoids UTC date
+        // showing the previous/next day when the user is not in UTC)
+        const arrivalTime = arrivalDateTime.toTimeString().slice(0, 5); // HH:mm local
+        const y = arrivalDateTime.getFullYear();
+        const m = String(arrivalDateTime.getMonth() + 1).padStart(2, "0");
+        const d = String(arrivalDateTime.getDate()).padStart(2, "0");
+        const arrivalDate = `${y}-${m}-${d}`; // YYYY-MM-DD local
 
         // Format duration as "H:MM hrs"
         const totalHours = Math.floor(totalDurationSeconds / 3600);

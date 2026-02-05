@@ -4,7 +4,7 @@ import { AddressInput } from "../../AddressInput";
 import type { LeadSchemaType } from "../oneway-steps/schema";
 
 type AddStopEditProps = {
-  fieldPrefix: `outbound_trip.trip_stops.${number}`;
+  fieldPrefix: `outbound_trip.trip_stops.${number}` | `return_trip.trip_stops.${number}`;
   onRemove: () => void;
   onDone: () => void;
 };
@@ -131,11 +131,12 @@ const AddedStopDisplay = ({
 type StopComposerProps = {
   index: number;
   onRemove: () => void;
+  tripPath?: "outbound_trip.trip_stops" | "return_trip.trip_stops";
 };
 
-export const StopComposer = ({ index, onRemove }: StopComposerProps) => {
+export const StopComposer = ({ index, onRemove, tripPath = "outbound_trip.trip_stops" }: StopComposerProps) => {
   const { watch, setValue } = useFormContext<LeadSchemaType>();
-  const fieldPrefix = `outbound_trip.trip_stops.${index}` as const;
+  const fieldPrefix = `${tripPath}.${index}` as const;
 
   const stop = watch(fieldPrefix);
   const isEditing = stop?.isEditing ?? true;

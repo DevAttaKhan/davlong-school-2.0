@@ -48,7 +48,7 @@ export const PrivacyAndSubmitSection = ({
           className={`py-3 px-6 rounded-full font-normal flex items-center justify-center gap-2 transition-colors ${
             privacyAgreed
               ? "bg-[#15803D] text-white hover:bg-[#0f6b2f]"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-gray-300 text-white cursor-not-allowed"
           }`}
         >
           <span>Send My Quote Request</span>

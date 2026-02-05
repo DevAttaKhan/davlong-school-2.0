@@ -1,4 +1,4 @@
-import { Flag, Triangle } from "lucide-react";
+import { Flag, Triangle, Pencil, MapPin } from "lucide-react";
 import { clsx } from "clsx";
 
 type JourneyTimelineProps = {
@@ -6,6 +6,8 @@ type JourneyTimelineProps = {
   dropoffLocation: string;
   children?: React.ReactNode;
   addStopButton: React.ReactNode;
+  onEditPickup?: () => void;
+  onEditDestination?: () => void;
 };
 
 const TIMELINE_LINE_CLASS =
@@ -23,6 +25,8 @@ export const JourneyTimeline = ({
   dropoffLocation,
   children,
   addStopButton,
+  onEditPickup,
+  onEditDestination,
 }: JourneyTimelineProps) => {
   return (
     <div className="relative">
@@ -33,10 +37,30 @@ export const JourneyTimeline = ({
         <div className={ORIGIN_DOT_CLASS}>
           <Triangle className="w-3 h-3 text-white fill-white rotate-180" />
         </div>
-        <div className={clsx(LOCATION_BOX_CLASS, "min-w-0")}>
-          <span className="text-sm font-medium text-gray-900 truncate block">
-            {pickupLocation || "Pick-up location"}
-          </span>
+        <div className={clsx(LOCATION_BOX_CLASS, "min-w-0 relative group")}>
+          {pickupLocation ? (
+            <>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
+                <span className="text-sm font-medium text-gray-900 truncate block">
+                  {pickupLocation}
+                </span>
+              </div>
+              {onEditPickup && (
+                <button
+                  type="button"
+                  onClick={onEditPickup}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                >
+                  <Pencil className="w-3 h-3 text-blue-600" />
+                </button>
+              )}
+            </>
+          ) : (
+            <span className="text-sm font-medium text-gray-500">
+              Pick-up location
+            </span>
+          )}
         </div>
       </div>
 
@@ -51,10 +75,30 @@ export const JourneyTimeline = ({
         <div className={DESTINATION_DOT_CLASS}>
           <Flag className="w-3 h-3 text-white fill-white" />
         </div>
-        <div className={clsx(LOCATION_BOX_CLASS, "min-w-0")}>
-          <span className="text-sm font-medium text-gray-900 truncate block">
-            {dropoffLocation || "Destination"}
-          </span>
+        <div className={clsx(LOCATION_BOX_CLASS, "min-w-0 relative group")}>
+          {dropoffLocation ? (
+            <>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
+                <span className="text-sm font-medium text-gray-900 truncate block">
+                  {dropoffLocation}
+                </span>
+              </div>
+              {onEditDestination && (
+                <button
+                  type="button"
+                  onClick={onEditDestination}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                >
+                  <Pencil className="w-3 h-3 text-blue-600" />
+                </button>
+              )}
+            </>
+          ) : (
+            <span className="text-sm font-medium text-gray-500">
+              Destination
+            </span>
+          )}
         </div>
       </div>
     </div>

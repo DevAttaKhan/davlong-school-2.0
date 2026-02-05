@@ -33,8 +33,8 @@ export const ContactDetailsStep = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] px-2 sm:px-4">
-      <div className="max-w-[982px] mx-auto bg-white rounded-lg shadow-sm p-2 sm:p-4 mt-[40px]">
+    <div className="min-h-screen bg-[#f9fafb] px-2 py-6 sm:px-4 sm:py-8">
+      <div className="max-w-[982px] mx-auto bg-white rounded-lg shadow-sm p-2 sm:p-4 pb-8 sm:pb-10">
         <StepHeader
           progressValue={STEP_PROGRESS.CONTACT_DETAILS}
           onBack={prevStep}

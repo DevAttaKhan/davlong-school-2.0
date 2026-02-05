@@ -1,13 +1,14 @@
 import { clsx } from "clsx";
 import { MapPin, X } from "lucide-react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useFieldArray } from "react-hook-form";
 import { LocationField } from "../LocationField";
 import { StepProgressBar } from "../StepProgressBar";
-import { InfoBox } from "../InfoBox";
+import { DoubleCheckAddressesBox } from "../DoubleCheckAddressesBox";
+import { ExtraStopsSection } from "../ExtraStopsSection";
 import { CONTENT_PADDING, STEP_PROGRESS } from "../constants";
-import type { LeadSchemaType } from "./schema";
+import type { LeadSchemaType } from "../oneway-steps/schema";
 
-type SelectPickupLocationProps = {
+type SelectReturnPickupLocationProps = {
   nextStep: (nextStep?: string) => void;
   prevStep: () => void;
 };
@@ -21,20 +22,42 @@ const CANCEL_BUTTON_CLASS =
 const NEXT_BUTTON_CLASS =
   "flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-3xl hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors";
 
-export const SelectPickupLocation = ({
+export const SelectReturnPickupLocation = ({
   nextStep,
   prevStep,
-}: SelectPickupLocationProps) => {
+}: SelectReturnPickupLocationProps) => {
   "use no memo";
   const {
     setValue,
     watch,
     trigger,
+    control,
     formState: { errors },
   } = useFormContext<LeadSchemaType>();
 
   const pickupLocation = watch("outbound_trip.pickup_location");
   const dropoffLocation = watch("outbound_trip.dropoff_location");
+
+  const { fields, append, remove } = useFieldArray<
+    LeadSchemaType,
+    "outbound_trip.trip_stops"
+  >({
+    control,
+    name: "outbound_trip.trip_stops",
+  });
+
+  const handleAddStop = () => {
+    append({
+      isEditing: true,
+      estimated_time: 0,
+      location: "",
+      stop_order: fields.length + 1,
+    });
+  };
+
+  const handleRemoveStop = (index: number) => {
+    remove(index);
+  };
 
   const validateLocations = async () => {
     const isValid = await trigger([
@@ -47,7 +70,25 @@ export const SelectPickupLocation = ({
   const handleNextStep = () => {
     validateLocations().then((isValid) => {
       if (isValid) {
-        nextStep("add-stops");
+        // Save all stops by setting isEditing to false for any stops still in edit mode
+        fields.forEach((_, index) => {
+          const stop = watch(`outbound_trip.trip_stops.${index}`);
+          if (stop?.isEditing && stop?.location) {
+            setValue(`outbound_trip.trip_stops.${index}.isEditing`, false);
+          }
+        });
+        // "Let's plan your trip" is stored in outbound_trip and never overwritten by return trip.
+        // When moving to "plan return journey", initialize return_trip from reversed outbound
+        // only if return trip locations are not yet set (so user's return edits persist when switching forms).
+        const outboundPickup = watch("outbound_trip.pickup_location") ?? "";
+        const outboundDropoff = watch("outbound_trip.dropoff_location") ?? "";
+        const returnPickup = watch("return_trip.pickup_location") ?? "";
+        const returnDropoff = watch("return_trip.dropoff_location") ?? "";
+        if (!returnPickup && !returnDropoff) {
+          setValue("return_trip.pickup_location", outboundDropoff);
+          setValue("return_trip.dropoff_location", outboundPickup);
+        }
+        nextStep("plan-return-journey");
       }
     });
   };
@@ -91,8 +132,7 @@ export const SelectPickupLocation = ({
               Let's plan your trip
             </h1>
             <p className="text-sm font-normal leading-[145%] tracking-tight text-center text-gray-600 mt-1">
-              We'll start by finding out where you're going and where you want
-              to be picked up.
+              Tell us where your trip begins, where you're going, and whether you need any stops along the way.
             </p>
           </div>
 
@@ -103,8 +143,7 @@ export const SelectPickupLocation = ({
               description={
                 <>
                   Where should we pick you up? <br />
-                  Please enter the exact address or Eircode where your trip will
-                  begin.
+                  Please enter the exact address or Eircode where your trip will begin.
                   <br />
                   (Example: West Cork Hotel Skibbereen or P81 FH63)
                 </>
@@ -128,9 +167,15 @@ export const SelectPickupLocation = ({
               placeholder="Enter destination address or Eircode..."
             />
 
-            <InfoBox
-              title="Do you want to make stops along the way?"
-              description="No problem – you can add extra stops in the next step."
+            <DoubleCheckAddressesBox />
+
+            <ExtraStopsSection
+              pickupLocation={pickupLocation ?? ""}
+              dropoffLocation={dropoffLocation ?? ""}
+              fields={fields}
+              tripPath="outbound_trip.trip_stops"
+              onAddStop={handleAddStop}
+              onRemoveStop={handleRemoveStop}
             />
           </div>
         </div>
@@ -143,7 +188,7 @@ export const SelectPickupLocation = ({
             disabled={!pickupLocation || !dropoffLocation}
             className={NEXT_BUTTON_CLASS}
           >
-            Next: Add Stops
+            Next: Plan Return Journey
           </button>
         </div>
       </div>

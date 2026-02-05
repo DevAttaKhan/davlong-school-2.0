@@ -36,33 +36,15 @@ export const ContactDetailsSection = ({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {/* Left Column */}
-        <div className="space-y-4">
+      <div className="space-y-4">
+        {/* Row 1: School Name and Teacher In Charge */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
             <p className="text-xs text-gray-500 uppercase mb-1">SCHOOL NAME</p>
             <p className="text-sm font-medium text-gray-900">
               {schoolName || "Not specified"}
             </p>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 uppercase mb-1">EMAIL</p>
-            <p className="text-sm font-medium text-gray-900">
-              {email || "Not specified"}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 uppercase mb-1">
-              ADDITIONAL INFORMATION
-            </p>
-            <p className="text-sm text-gray-600">
-              {additionalInfo || "No additional information provided"}
-            </p>
-          </div>
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-4">
           <div>
             <p className="text-xs text-gray-500 uppercase mb-1">
               TEACHER IN CHARGE
@@ -71,12 +53,32 @@ export const ContactDetailsSection = ({
               {teacherInCharge || "Not specified"}
             </p>
           </div>
+        </div>
+
+        {/* Row 2: Email and Phone */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <p className="text-xs text-gray-500 uppercase mb-1">EMAIL</p>
+            <p className="text-sm font-medium text-gray-900">
+              {email || "Not specified"}
+            </p>
+          </div>
           <div>
             <p className="text-xs text-gray-500 uppercase mb-1">PHONE</p>
             <p className="text-sm font-medium text-gray-900">
               {phoneNumber ? `+353 ${phoneNumber}` : "Not provided"}
             </p>
           </div>
+        </div>
+
+        {/* Row 3: Additional Information (Full Width) */}
+        <div>
+          <p className="text-xs text-gray-500 uppercase mb-1">
+            ADDITIONAL INFORMATION
+          </p>
+          <p className="text-sm text-gray-600">
+            {additionalInfo || "No additional information provided"}
+          </p>
         </div>
       </div>
     </div>

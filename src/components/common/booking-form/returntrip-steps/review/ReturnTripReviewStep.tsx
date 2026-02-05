@@ -1,20 +1,23 @@
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { StepHeader } from "../StepHeader";
-import { CONTENT_PADDING, STEP_PROGRESS } from "../constants";
-import { TripSummarySection } from "./review/TripSummarySection";
-import { PassengersSection } from "./review/PassengersSection";
-import { ContactDetailsSection } from "./review/ContactDetailsSection";
-import { PrivacyAndSubmitSection } from "./review/PrivacyAndSubmitSection";
-import { FeatureIconsSection } from "./review/FeatureIconsSection";
-import type { LeadSchemaType } from "./schema";
+import { StepHeader } from "../../StepHeader";
+import { CONTENT_PADDING, STEP_PROGRESS } from "../../constants";
+import { ReturnTripSummarySection } from "./ReturnTripSummarySection";
+import { PassengersSection } from "../../oneway-steps/review/PassengersSection";
+import { ContactDetailsSection } from "../../oneway-steps/review/ContactDetailsSection";
+import { PrivacyAndSubmitSection } from "../../oneway-steps/review/PrivacyAndSubmitSection";
+import { FeatureIconsSection } from "../../oneway-steps/review/FeatureIconsSection";
+import type { LeadSchemaType } from "../../oneway-steps/schema";
 
-type ReviewStepProps = {
+type ReturnTripReviewStepProps = {
   prevStep: () => void;
   navigateToStep?: (step: string) => void;
 };
 
-export const ReviewStep = ({ prevStep, navigateToStep }: ReviewStepProps) => {
+export const ReturnTripReviewStep = ({
+  prevStep,
+  navigateToStep,
+}: ReturnTripReviewStepProps) => {
   const { watch } = useFormContext<LeadSchemaType>();
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
 
@@ -22,6 +25,7 @@ export const ReviewStep = ({ prevStep, navigateToStep }: ReviewStepProps) => {
   const formData = watch();
   const {
     outbound_trip,
+    return_trip,
     teachers_count,
     students_count,
     school_name,
@@ -34,7 +38,12 @@ export const ReviewStep = ({ prevStep, navigateToStep }: ReviewStepProps) => {
   // Prepare payload for backend API
   const preparePayload = () => {
     // Clean up trip stops - remove UI-only fields
-    const cleanedTripStops = outbound_trip?.trip_stops?.map((stop) => {
+    const cleanedOutboundStops = outbound_trip?.trip_stops?.map((stop) => {
+      const { isEditing, ...cleanStop } = stop;
+      return cleanStop;
+    });
+
+    const cleanedReturnStops = return_trip?.trip_stops?.map((stop) => {
       const { isEditing, ...cleanStop } = stop;
       return cleanStop;
     });
@@ -60,7 +69,20 @@ export const ReviewStep = ({ prevStep, navigateToStep }: ReviewStepProps) => {
         arrival_date: outbound_trip?.arrival_date,
         duration: outbound_trip?.duration,
         distance: outbound_trip?.distance,
-        trip_stops: cleanedTripStops || [],
+        trip_stops: cleanedOutboundStops || [],
+      },
+
+      return_trip: {
+        type: return_trip?.type || "RETURN",
+        pickup_location: return_trip?.pickup_location,
+        dropoff_location: return_trip?.dropoff_location,
+        pickup_date: return_trip?.pickup_date,
+        pickup_time: return_trip?.pickup_time,
+        arrival_time: return_trip?.arrival_time,
+        arrival_date: return_trip?.arrival_date,
+        duration: return_trip?.duration,
+        distance: return_trip?.distance,
+        trip_stops: cleanedReturnStops || [],
       },
 
       // Metadata
@@ -71,12 +93,12 @@ export const ReviewStep = ({ prevStep, navigateToStep }: ReviewStepProps) => {
     return payload;
   };
 
-
   const handleSendRequest = () => {
     if (privacyAgreed) {
+      const payload = preparePayload();
       // TODO: Implement API call to send booking request
-      // const payload = preparePayload();
-      // Example: await fetch('/api/bookings', { method: 'POST', body: JSON.stringify(payload) })
+      // await fetch('/api/bookings', { method: 'POST', body: JSON.stringify(payload) })
+      void payload;
     }
   };
 
@@ -120,8 +142,9 @@ export const ReviewStep = ({ prevStep, navigateToStep }: ReviewStepProps) => {
             <h1 className="text-[32px] font-semibold leading-[110%] tracking-[-0.04em] text-[#053373] text-center">
               Review your booking
             </h1>
-            <p className="text-black text-sm text-center whitespace-nowrap mt-2">
-              Please check that all your trip details are correct before sending your request.
+            <p className="text-black text-sm text-center mt-2">
+              Please check that all your trip details are correct before sending
+              your request.
             </p>
             <div className="w-16 h-1 bg-blue-600 mx-auto mt-4"></div>
           </div>
@@ -129,8 +152,9 @@ export const ReviewStep = ({ prevStep, navigateToStep }: ReviewStepProps) => {
           {/* Review Sections */}
           <div className="max-w-[670px] mx-auto space-y-6">
             {/* Trip Summary Section */}
-            <TripSummarySection
-              tripData={outbound_trip}
+            <ReturnTripSummarySection
+              outboundTrip={outbound_trip ?? undefined}
+              returnTrip={return_trip ?? undefined}
               onEdit={handleEditTrip}
             />
 

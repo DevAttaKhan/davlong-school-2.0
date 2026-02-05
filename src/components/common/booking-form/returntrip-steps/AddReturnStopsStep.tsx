@@ -1,16 +1,16 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { ArrowSharpRight } from "@/assets/icons";
 import { StepHeader } from "../StepHeader";
 import { JourneyTimeline, JourneyStopDot } from "../oneway-steps/JourneyTimeline";
-import { StopComposer } from "./AddStopElements";
-import { AddStopButton } from "./AddStopButton";
-import { ExtraStopsInfo } from "./ExtraStopsInfo";
-import { NoStopsConfirmationDialog } from "./NoStopsConfirmationDialog";
+import { StopComposer } from "../trip-stops/AddStopElements";
+import { AddStopButton } from "../trip-stops/AddStopButton";
+import { ExtraStopsInfo } from "../trip-stops/ExtraStopsInfo";
+import { NoStopsConfirmationDialog } from "../trip-stops/NoStopsConfirmationDialog";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { type LeadSchemaType } from "../oneway-steps/schema";
 import { CONTENT_PADDING, STEP_PROGRESS } from "../constants";
 
-type AddStopsStepProps = {
+type AddReturnStopsStepProps = {
   nextStep: (step?: string) => void;
   prevStep: () => void;
 };
@@ -18,20 +18,20 @@ type AddStopsStepProps = {
 const NEXT_BUTTON_CLASS =
   "flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-[1.5rem] hover:bg-blue-700 transition-colors";
 
-export const AddStopsStep = ({ nextStep, prevStep }: AddStopsStepProps) => {
-  const { control, watch, getValues } = useFormContext<LeadSchemaType>();
+export const AddReturnStopsStep = ({ nextStep, prevStep }: AddReturnStopsStepProps) => {
+  const { control, watch } = useFormContext<LeadSchemaType>();
   const [showDialog, setShowDialog] = useState(false);
 
   const { fields, append, remove } = useFieldArray<
     LeadSchemaType,
-    "outbound_trip.trip_stops"
+    "return_trip.trip_stops"
   >({
     control,
-    name: "outbound_trip.trip_stops",
+    name: "return_trip.trip_stops",
   });
 
-  const pickupLocation = watch("outbound_trip.pickup_location") ?? "";
-  const dropoffLocation = watch("outbound_trip.dropoff_location") ?? "";
+  const pickupLocation = watch("return_trip.pickup_location") ?? "";
+  const dropoffLocation = watch("return_trip.dropoff_location") ?? "";
 
   const handleAddStop = () => {
     append({
@@ -56,14 +56,12 @@ export const AddStopsStep = ({ nextStep, prevStep }: AddStopsStepProps) => {
     } else {
       // Proceed to next step if stops are added
       nextStep("dates-times");
-      console.log(getValues());
     }
   };
 
   const handleProceed = () => {
     setShowDialog(false);
     nextStep("dates-times");
-    console.log(getValues());
   };
 
   const handleCancel = () => {
@@ -89,10 +87,10 @@ export const AddStopsStep = ({ nextStep, prevStep }: AddStopsStepProps) => {
               </div>
             </div>
             <h1 className="text-[32px] font-semibold leading-[110%] tracking-[-0.04em] text-[#053373] text-center">
-              Outbound Journey
+              Return Journey
             </h1>
             <p className="text-black text-sm text-center max-w-md mx-auto px-4">
-              Let&apos;s plan your outbound journey in more details.
+              Let&apos;s plan your return journey in more details.
             </p>
           </div>
 
@@ -114,6 +112,7 @@ export const AddStopsStep = ({ nextStep, prevStep }: AddStopsStepProps) => {
                     <StopComposer
                       index={index}
                       onRemove={() => handleRemoveStop(index)}
+                      tripPath="return_trip.trip_stops"
                     />
                   </div>
                 ))}
