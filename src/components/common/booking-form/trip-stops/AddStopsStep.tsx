@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { ArrowSharpRight } from "@/assets/icons";
 import { StepHeader } from "../StepHeader";
 import { JourneyTimeline, JourneyStopDot } from "../oneway-steps/JourneyTimeline";
 import { StopComposer } from "./AddStopElements";
 import { AddStopButton } from "./AddStopButton";
 import { ExtraStopsInfo } from "./ExtraStopsInfo";
+import { NoStopsConfirmationDialog } from "./NoStopsConfirmationDialog";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { type LeadSchemaType } from "../oneway-steps/schema";
 import { CONTENT_PADDING, STEP_PROGRESS } from "../constants";
@@ -18,6 +20,7 @@ const NEXT_BUTTON_CLASS =
 
 export const AddStopsStep = ({ nextStep, prevStep }: AddStopsStepProps) => {
   const { control, watch, getValues } = useFormContext<LeadSchemaType>();
+  const [showDialog, setShowDialog] = useState(false);
 
   const { fields, append, remove } = useFieldArray<
     LeadSchemaType,
@@ -41,6 +44,30 @@ export const AddStopsStep = ({ nextStep, prevStep }: AddStopsStepProps) => {
 
   const handleRemoveStop = (index: number) => {
     remove(index);
+  };
+
+  const handleNext = () => {
+    // Check if any stops have been added
+    const hasStops = fields.length > 0;
+    
+    if (!hasStops) {
+      // Show dialog if no stops added
+      setShowDialog(true);
+    } else {
+      // Proceed to next step if stops are added
+      nextStep("dates-times");
+      console.log(getValues());
+    }
+  };
+
+  const handleProceed = () => {
+    setShowDialog(false);
+    nextStep("dates-times");
+    console.log(getValues());
+  };
+
+  const handleCancel = () => {
+    setShowDialog(false);
   };
 
   return (
@@ -98,16 +125,20 @@ export const AddStopsStep = ({ nextStep, prevStep }: AddStopsStepProps) => {
         <div className={`flex justify-end mt-8 ${CONTENT_PADDING}`}>
           <button
             type="button"
-            onClick={() => {
-              nextStep("dates-times");
-              console.log(getValues());
-            }}
+            onClick={handleNext}
             className={NEXT_BUTTON_CLASS}
           >
             <span>Next: Choose Dates & Times</span>
           </button>
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      <NoStopsConfirmationDialog
+        isOpen={showDialog}
+        onClose={handleCancel}
+        onProceed={handleProceed}
+      />
     </div>
   );
 };

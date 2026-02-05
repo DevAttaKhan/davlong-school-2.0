@@ -10,12 +10,10 @@ type Props = {
 
 export const SelectTripType: React.FC<Props> = ({ selectTripType }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex flex-col">
-      <div className="flex-1 flex flex-col mt-[40px]">
-        <div className="flex-1 px-3 sm:px-4 py-4 overflow-y-auto scrollbar-hide">
-          <div className="mx-auto w-full max-w-[982px] md:h-[643px]">
-            {/* Trip Type Selection */}
-            <div className="text-center py-6 sm:py-8 md:py-12 bg-white rounded-2xl shadow-lg border border-blue-100 p-3 sm:p-4">
+    <div className="flex flex-col px-3 sm:px-4 py-4 flex-1">
+      <div className="mx-auto w-full max-w-[982px] mt-[60px] sm:mt-[80px]">
+        {/* Trip Type Selection */}
+        <div className="text-center py-6 sm:py-8 md:py-12 bg-white rounded-2xl shadow-lg border border-blue-100 p-3 sm:p-4">
               {/* Header bar with Back + Stepper + Cancel */}
               <div className="flex items-center justify-between pb-3 gap-1 sm:gap-4">
                 <button className="text-blue-600 text-xs sm:text-sm hover:text-blue-700 transition-colors duration-200 px-1.5 sm:px-3 py-1.5 rounded-[2.375rem]  bg-white"></button>
@@ -48,12 +46,8 @@ export const SelectTripType: React.FC<Props> = ({ selectTripType }) => {
                 </h1>
               </div>
               <div className="px-4 sm:px-8 md:px-[70px]">
-                <p
-                  className="text-black text-center text-sm sm:text-base md:text-[18px] leading-[145%] tracking-[-0.02em] font-normal my-4 sm:my-6"
-                  style={{ fontFamily: "Inter" }}
-                >
-                  We’ll start by finding out where you’re going and where you
-                  want to be picked up.
+              <p className="text-gray-400 text-sm leading-relaxed text-center m-4">
+                 Select whether you need a return trip or a one-way journey.
                 </p>
               </div>
 
@@ -66,12 +60,10 @@ export const SelectTripType: React.FC<Props> = ({ selectTripType }) => {
                     <RefreshCw  className="w-8 h-8  text-white" />
                   </div>
                   <h3 className="text-base font-bold text-black mb-3 group-hover:text-blue-700 transition-colors duration-200">
-                    You travel to your destination and then come back to where
-                    you started.
+                  Return Trip
                   </h3>
                   <p className="text-gray-400 text-sm leading-relaxed text-center">
-                    You travel to your destination and back again to the
-                    starting point
+                    You travel to your destination and then come back to where you started.
                   </p>
                 </button>
 
@@ -83,16 +75,13 @@ export const SelectTripType: React.FC<Props> = ({ selectTripType }) => {
                     <ArrowRight className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="text-base font-bold text-black mb-3 group-hover:text-blue-700 transition-colors duration-200">
-                    You travel to your destination and finish there, without
-                    coming back.
+                    One Way Trip
                   </h3>
                   <p className="text-gray-400 text-sm leading-relaxed text-center">
-                    You travel from one place to another, without returning
+                    You travel to your destination and finish there, without coming back.
                   </p>
                 </button>
               </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

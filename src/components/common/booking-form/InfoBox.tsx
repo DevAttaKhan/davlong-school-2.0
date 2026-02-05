@@ -24,7 +24,7 @@ export const InfoBox = ({
       </div>
       <div className="min-w-0">
         <p className="text-gray-900 font-bold mb-1">{title}</p>
-        <div className="text-gray-500 text-sm">{description}</div>
+        <div className="text-gray-500 text-base">{description}</div>
       </div>
     </div>
   );
