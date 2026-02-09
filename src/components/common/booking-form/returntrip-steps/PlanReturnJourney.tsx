@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Undo2 } from "lucide-react";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { StepHeader } from "../StepHeader";
+import { NoStopsConfirmationDialog } from "../trip-stops/NoStopsConfirmationDialog";
 import { CONTENT_PADDING, STEP_PROGRESS } from "../constants";
 import { JourneyStopDot } from "../oneway-steps/JourneyTimeline";
 import { ReturnJourneyTimeline } from "../oneway-steps/ReturnJourneyTimeline";
@@ -19,15 +20,19 @@ type PlanReturnJourneyProps = {
 const NEXT_BUTTON_CLASS =
   "flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-[1.5rem] hover:bg-blue-700 transition-colors";
 
-export const PlanReturnJourney = ({ nextStep, prevStep }: PlanReturnJourneyProps) => {
-  const { watch, control, setValue, getValues } = useFormContext<LeadSchemaType>();
-  
+export const PlanReturnJourney = ({
+  nextStep,
+  prevStep,
+}: PlanReturnJourneyProps) => {
+  const { watch, control, setValue, getValues } =
+    useFormContext<LeadSchemaType>();
+
   // Get toggle state from form context (persists across navigation)
   const getToggleState = () => {
     const stored = getValues("return_trip.use_same_stops" as any);
     return stored === true || stored === "true";
   };
-  
+
   const [useSameStops, setUseSameStops] = useState(() => getToggleState());
   const [hasToggled, setHasToggled] = useState(false);
   const [savedReturnStops, setSavedReturnStops] = useState<any[]>([]);
@@ -35,6 +40,7 @@ export const PlanReturnJourney = ({ nextStep, prevStep }: PlanReturnJourneyProps
   const [editingDestination, setEditingDestination] = useState(false);
   const [tempPickupLocation, setTempPickupLocation] = useState("");
   const [tempDropoffLocation, setTempDropoffLocation] = useState("");
+  const [showNoStopsDialog, setShowNoStopsDialog] = useState(false);
 
   const pickupLocation = watch("return_trip.pickup_location") ?? "";
   const dropoffLocation = watch("return_trip.dropoff_location") ?? "";
@@ -66,22 +72,22 @@ export const PlanReturnJourney = ({ nextStep, prevStep }: PlanReturnJourneyProps
   // Initialize toggle state from form context on mount and save original stops
   useEffect(() => {
     const storedToggleState = getToggleState();
-    
+
     // Save original return stops BEFORE restoring toggle state
     // This ensures we have the original stops if toggle was previously OFF
     if (currentReturnStops.length > 0 && savedReturnStops.length === 0) {
       // Only save if stops don't match outbound stops (meaning they're original, not copied)
-      const stopsMatchOutbound = 
+      const stopsMatchOutbound =
         outboundStops.length === currentReturnStops.length &&
-        currentReturnStops.every((stop, idx) => 
-          outboundStops[idx]?.location === stop.location
+        currentReturnStops.every(
+          (stop, idx) => outboundStops[idx]?.location === stop.location
         );
-      
+
       if (!stopsMatchOutbound) {
         setSavedReturnStops([...currentReturnStops]);
       }
     }
-    
+
     // Restore toggle state from form context
     if (storedToggleState) {
       setUseSameStops(true);
@@ -112,9 +118,10 @@ export const PlanReturnJourney = ({ nextStep, prevStep }: PlanReturnJourneyProps
     setHasToggled(true);
     setUseSameStops(newValue);
     // Persist toggle state in form context
-    setValue("return_trip.use_same_stops" as any, newValue, { shouldValidate: false });
+    setValue("return_trip.use_same_stops" as any, newValue, {
+      shouldValidate: false,
+    });
   };
-
 
   // Initialize temp values when editing starts
   useEffect(() => {
@@ -173,7 +180,21 @@ export const PlanReturnJourney = ({ nextStep, prevStep }: PlanReturnJourneyProps
   };
 
   const handleNext = () => {
+    const hasStops = fields.length > 0;
+    if (!hasStops) {
+      setShowNoStopsDialog(true);
+    } else {
+      nextStep("dates-times");
+    }
+  };
+
+  const handleProceedNoStops = () => {
+    setShowNoStopsDialog(false);
     nextStep("dates-times");
+  };
+
+  const handleCancelNoStops = () => {
+    setShowNoStopsDialog(false);
   };
 
   return (
@@ -195,7 +216,8 @@ export const PlanReturnJourney = ({ nextStep, prevStep }: PlanReturnJourneyProps
               Let&apos;s plan your return trip
             </h1>
             <p className="text-black text-sm text-center max-w-md mx-auto px-4 mt-2">
-              Tell us how you&apos;d like to come back — and if you want to stop anywhere along the way.
+              Tell us how you&apos;d like to come back — and if you want to stop
+              anywhere along the way.
             </p>
           </div>
 
@@ -277,6 +299,12 @@ export const PlanReturnJourney = ({ nextStep, prevStep }: PlanReturnJourneyProps
           </button>
         </div>
       </div>
+
+      <NoStopsConfirmationDialog
+        isOpen={showNoStopsDialog}
+        onClose={handleCancelNoStops}
+        onProceed={handleProceedNoStops}
+      />
     </div>
   );
 };

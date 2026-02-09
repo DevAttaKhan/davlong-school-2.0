@@ -3,7 +3,6 @@ import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRight,
-  ChevronRightIcon,
 } from "lucide-react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { DayPicker } from "react-day-picker";

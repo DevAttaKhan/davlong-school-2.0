@@ -20,7 +20,7 @@ export const Header = () => {
       {/* Login Button */}
       <button
         onClick={() => navigate("/login")}
-        className="px-4 sm:px-6 py-1.5 sm:py-2 bg-blue-500 hover:bg-blue-400 text-white font-normal text-xs sm:text-sm uppercase tracking-wide rounded-lg border border-blue-300/50 transition-all duration-200"
+        className="px-4 sm:px-6 py-1.5 sm:py-2 bg-blue-500 hover:bg-blue-400 text-white font-semibold text-xs sm:text-sm uppercase tracking-wide rounded-full border border-blue-300/50 transition-all duration-200"
       >
         LOGIN
       </button>

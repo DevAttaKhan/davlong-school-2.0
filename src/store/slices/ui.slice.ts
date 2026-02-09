@@ -11,6 +11,7 @@ interface UiState {
   venueLayoutView: LayoutView;
   sharedInventoryLayoutView: LayoutView;
   bookingLayoutView: LayoutView;
+  notificationCount: number;
 }
 
 const initialState: UiState = {
@@ -20,7 +21,8 @@ const initialState: UiState = {
   eventLayoutView: "table",
   venueLayoutView: "table",
   sharedInventoryLayoutView: "table",
-  bookingLayoutView: "table"
+  bookingLayoutView: "table",
+  notificationCount: 0,
 };
 
 export const uiSlice = createSlice({
@@ -50,8 +52,8 @@ export const uiSlice = createSlice({
     },
     setBookingLayoutView: (state, action: PayloadAction<LayoutView>) => {
       state.bookingLayoutView = action.payload;
-    }
-  }
+    },
+  },
 });
 
 export const {
@@ -61,7 +63,7 @@ export const {
   setEventLayoutView,
   setVenueLayoutView,
   setSharedInventoryLayoutView,
-  setBookingLayoutView
+  setBookingLayoutView,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

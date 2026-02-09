@@ -4,12 +4,14 @@ type PrivacyAndSubmitSectionProps = {
   privacyAgreed: boolean;
   onPrivacyChange: (agreed: boolean) => void;
   onSubmit: () => void;
+  isSubmitting?: boolean;
 };
 
 export const PrivacyAndSubmitSection = ({
   privacyAgreed,
   onPrivacyChange,
   onSubmit,
+  isSubmitting = false,
 }: PrivacyAndSubmitSectionProps) => {
   return (
     <>
@@ -44,14 +46,14 @@ export const PrivacyAndSubmitSection = ({
         <button
           type="button"
           onClick={onSubmit}
-          disabled={!privacyAgreed}
+          disabled={!privacyAgreed || isSubmitting}
           className={`py-3 px-6 rounded-full font-normal flex items-center justify-center gap-2 transition-colors ${
             privacyAgreed
               ? "bg-[#15803D] text-white hover:bg-[#0f6b2f]"
               : "bg-gray-300 text-white cursor-not-allowed"
           }`}
         >
-          <span>Send My Quote Request</span>
+          <span>{isSubmitting ? "Sending…" : "Send My Quote Request"}</span>
           <Send className="w-5 h-5" />
         </button>
       </div>

@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { StepHeader } from "../StepHeader";
+import { QuoteRequestSuccessModal } from "../QuoteRequestSuccessModal";
 import { CONTENT_PADDING, STEP_PROGRESS } from "../constants";
 import { TripSummarySection } from "./review/TripSummarySection";
 import { PassengersSection } from "./review/PassengersSection";
 import { ContactDetailsSection } from "./review/ContactDetailsSection";
 import { PrivacyAndSubmitSection } from "./review/PrivacyAndSubmitSection";
 import { FeatureIconsSection } from "./review/FeatureIconsSection";
+import { extractApiErrorMessage } from "@/lib/extractApiErrorMessage";
+import { useCreateLeadMutation } from "@/store/apis/lead.api";
+import type { CreateLeadRequestBody } from "@/types/lead.interface";
 import type { LeadSchemaType } from "./schema";
+import { toast } from "react-toastify";
 
 type ReviewStepProps = {
   prevStep: () => void;
@@ -15,8 +21,10 @@ type ReviewStepProps = {
 };
 
 export const ReviewStep = ({ prevStep, navigateToStep }: ReviewStepProps) => {
+  const navigate = useNavigate();
   const { watch } = useFormContext<LeadSchemaType>();
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Get all form values
   const formData = watch();
@@ -31,52 +39,48 @@ export const ReviewStep = ({ prevStep, navigateToStep }: ReviewStepProps) => {
     special_instructions,
   } = formData;
 
+  const [createLead, { isLoading: isSubmittingLead }] = useCreateLeadMutation();
+
   // Prepare payload for backend API
-  const preparePayload = () => {
-    // Clean up trip stops - remove UI-only fields
+  const preparePayload = (): CreateLeadRequestBody => {
     const cleanedTripStops = outbound_trip?.trip_stops?.map((stop) => {
       const { isEditing, ...cleanStop } = stop;
       return cleanStop;
     });
 
-    const payload = {
-      // Lead/Contact Information
-      school_name: school_name,
-      email: email,
-      teacher_incharge: teacher_incharge,
-      phone_number: phone_number,
-      special_instructions: special_instructions,
-      teachers_count: teachers_count,
-      students_count: students_count,
-
-      // Trip Information
+    return {
+      school_name: school_name ?? "",
+      email: email ?? "",
+      teacher_incharge: teacher_incharge ?? "",
+      phone_number: phone_number ?? "",
+      special_instructions: special_instructions ?? "",
+      teachers_count: teachers_count ?? 0,
+      students_count: students_count ?? 0,
       outbound_trip: {
-        type: outbound_trip?.type || "OUTBOUND",
-        pickup_location: outbound_trip?.pickup_location,
-        dropoff_location: outbound_trip?.dropoff_location,
-        pickup_date: outbound_trip?.pickup_date,
-        pickup_time: outbound_trip?.pickup_time,
-        arrival_time: outbound_trip?.arrival_time,
-        arrival_date: outbound_trip?.arrival_date,
-        duration: outbound_trip?.duration,
-        distance: outbound_trip?.distance,
-        trip_stops: cleanedTripStops || [],
+        type: outbound_trip?.type ?? "OUTBOUND",
+        pickup_location: outbound_trip?.pickup_location ?? "",
+        dropoff_location: outbound_trip?.dropoff_location ?? "",
+        pickup_date: outbound_trip?.pickup_date ?? "",
+        pickup_time: outbound_trip?.pickup_time ?? "",
+        arrival_time: outbound_trip?.arrival_time ?? "",
+        arrival_date: outbound_trip?.arrival_date ?? "",
+        duration: outbound_trip?.duration ?? "",
+        distance: outbound_trip?.distance ?? 0,
+        trip_stops: cleanedTripStops ?? [],
       },
-
-      // Metadata
       privacy_agreed: privacyAgreed,
       submitted_at: new Date().toISOString(),
     };
-
-    return payload;
   };
 
-
-  const handleSendRequest = () => {
-    if (privacyAgreed) {
-      // TODO: Implement API call to send booking request
-      // const payload = preparePayload();
-      // Example: await fetch('/api/bookings', { method: 'POST', body: JSON.stringify(payload) })
+  const handleSendRequest = async () => {
+    if (!privacyAgreed) return;
+    try {
+      const payload = preparePayload();
+      await createLead(payload).unwrap();
+      setShowSuccessModal(true);
+    } catch (err) {
+      toast.error(extractApiErrorMessage(err));
     }
   };
 
@@ -156,6 +160,7 @@ export const ReviewStep = ({ prevStep, navigateToStep }: ReviewStepProps) => {
               privacyAgreed={privacyAgreed}
               onPrivacyChange={setPrivacyAgreed}
               onSubmit={handleSendRequest}
+              isSubmitting={isSubmittingLead}
             />
 
             {/* Feature Icons */}
@@ -163,6 +168,14 @@ export const ReviewStep = ({ prevStep, navigateToStep }: ReviewStepProps) => {
           </div>
         </div>
       </div>
+
+      <QuoteRequestSuccessModal
+        isOpen={showSuccessModal}
+        onBackToHome={() => {
+          setShowSuccessModal(false);
+          navigate("/");
+        }}
+      />
     </div>
   );
 };

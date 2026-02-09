@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ArrowSharpRight } from "@/assets/icons";
 import { StepHeader } from "../StepHeader";
 import { JourneyTimeline, JourneyStopDot } from "../oneway-steps/JourneyTimeline";

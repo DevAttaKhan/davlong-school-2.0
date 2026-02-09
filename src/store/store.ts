@@ -13,6 +13,7 @@ import {
 import storage from "redux-persist/es/storage";
 
 import { apiSlice } from "./apis/base.api";
+import "./apis/lead.api";
 import { mapApi } from "./apis/map.api";
 import authSlice from "./slices/auth.slice";
 import uiSlice from "./slices/ui.slice";

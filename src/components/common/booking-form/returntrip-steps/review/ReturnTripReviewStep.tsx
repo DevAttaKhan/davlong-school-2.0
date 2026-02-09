@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { StepHeader } from "../../StepHeader";
+import { QuoteRequestSuccessModal } from "../../QuoteRequestSuccessModal";
 import { CONTENT_PADDING, STEP_PROGRESS } from "../../constants";
 import { ReturnTripSummarySection } from "./ReturnTripSummarySection";
 import { PassengersSection } from "../../oneway-steps/review/PassengersSection";
 import { ContactDetailsSection } from "../../oneway-steps/review/ContactDetailsSection";
 import { PrivacyAndSubmitSection } from "../../oneway-steps/review/PrivacyAndSubmitSection";
 import { FeatureIconsSection } from "../../oneway-steps/review/FeatureIconsSection";
+import { extractApiErrorMessage } from "@/lib/extractApiErrorMessage";
+import { useCreateLeadMutation } from "@/store/apis/lead.api";
+import type { CreateLeadRequestBody } from "@/types/lead.interface";
 import type { LeadSchemaType } from "../../oneway-steps/schema";
+import { toast } from "react-toastify";
 
 type ReturnTripReviewStepProps = {
   prevStep: () => void;
@@ -18,8 +24,10 @@ export const ReturnTripReviewStep = ({
   prevStep,
   navigateToStep,
 }: ReturnTripReviewStepProps) => {
+  const navigate = useNavigate();
   const { watch } = useFormContext<LeadSchemaType>();
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Get all form values
   const formData = watch();
@@ -35,70 +43,63 @@ export const ReturnTripReviewStep = ({
     special_instructions,
   } = formData;
 
-  // Prepare payload for backend API
-  const preparePayload = () => {
-    // Clean up trip stops - remove UI-only fields
+  const [createLead, { isLoading: isSubmittingLead }] = useCreateLeadMutation();
+
+  const preparePayload = (): CreateLeadRequestBody => {
     const cleanedOutboundStops = outbound_trip?.trip_stops?.map((stop) => {
       const { isEditing, ...cleanStop } = stop;
       return cleanStop;
     });
-
     const cleanedReturnStops = return_trip?.trip_stops?.map((stop) => {
       const { isEditing, ...cleanStop } = stop;
       return cleanStop;
     });
 
-    const payload = {
-      // Lead/Contact Information
-      school_name: school_name,
-      email: email,
-      teacher_incharge: teacher_incharge,
-      phone_number: phone_number,
-      special_instructions: special_instructions,
-      teachers_count: teachers_count,
-      students_count: students_count,
-
-      // Trip Information
+    return {
+      school_name: school_name ?? "",
+      email: email ?? "",
+      teacher_incharge: teacher_incharge ?? "",
+      phone_number: phone_number ?? "",
+      special_instructions: special_instructions ?? "",
+      teachers_count: teachers_count ?? 0,
+      students_count: students_count ?? 0,
       outbound_trip: {
-        type: outbound_trip?.type || "OUTBOUND",
-        pickup_location: outbound_trip?.pickup_location,
-        dropoff_location: outbound_trip?.dropoff_location,
-        pickup_date: outbound_trip?.pickup_date,
-        pickup_time: outbound_trip?.pickup_time,
-        arrival_time: outbound_trip?.arrival_time,
-        arrival_date: outbound_trip?.arrival_date,
-        duration: outbound_trip?.duration,
-        distance: outbound_trip?.distance,
-        trip_stops: cleanedOutboundStops || [],
+        type: outbound_trip?.type ?? "OUTBOUND",
+        pickup_location: outbound_trip?.pickup_location ?? "",
+        dropoff_location: outbound_trip?.dropoff_location ?? "",
+        pickup_date: outbound_trip?.pickup_date ?? "",
+        pickup_time: outbound_trip?.pickup_time ?? "",
+        arrival_time: outbound_trip?.arrival_time ?? "",
+        arrival_date: outbound_trip?.arrival_date ?? "",
+        duration: outbound_trip?.duration ?? "",
+        distance: outbound_trip?.distance ?? 0,
+        trip_stops: cleanedOutboundStops ?? [],
       },
-
       return_trip: {
-        type: return_trip?.type || "RETURN",
-        pickup_location: return_trip?.pickup_location,
-        dropoff_location: return_trip?.dropoff_location,
-        pickup_date: return_trip?.pickup_date,
-        pickup_time: return_trip?.pickup_time,
-        arrival_time: return_trip?.arrival_time,
-        arrival_date: return_trip?.arrival_date,
-        duration: return_trip?.duration,
-        distance: return_trip?.distance,
-        trip_stops: cleanedReturnStops || [],
+        type: return_trip?.type ?? "RETURN",
+        pickup_location: return_trip?.pickup_location ?? "",
+        dropoff_location: return_trip?.dropoff_location ?? "",
+        pickup_date: return_trip?.pickup_date ?? "",
+        pickup_time: return_trip?.pickup_time ?? "",
+        arrival_time: return_trip?.arrival_time ?? "",
+        arrival_date: return_trip?.arrival_date ?? "",
+        duration: return_trip?.duration ?? "",
+        distance: return_trip?.distance ?? 0,
+        trip_stops: cleanedReturnStops ?? [],
       },
-
-      // Metadata
       privacy_agreed: privacyAgreed,
       submitted_at: new Date().toISOString(),
     };
-
-    return payload;
   };
 
-  const handleSendRequest = () => {
-    if (privacyAgreed) {
+  const handleSendRequest = async () => {
+    if (!privacyAgreed) return;
+    try {
       const payload = preparePayload();
-      // TODO: Implement API call to send booking request
-      // await fetch('/api/bookings', { method: 'POST', body: JSON.stringify(payload) })
-      void payload;
+      await createLead(payload).unwrap();
+      setShowSuccessModal(true);
+    } catch (err) {
+      toast.error(extractApiErrorMessage(err));
     }
   };
 
@@ -180,6 +181,7 @@ export const ReturnTripReviewStep = ({
               privacyAgreed={privacyAgreed}
               onPrivacyChange={setPrivacyAgreed}
               onSubmit={handleSendRequest}
+              isSubmitting={isSubmittingLead}
             />
 
             {/* Feature Icons */}
@@ -187,6 +189,14 @@ export const ReturnTripReviewStep = ({
           </div>
         </div>
       </div>
+
+      <QuoteRequestSuccessModal
+        isOpen={showSuccessModal}
+        onBackToHome={() => {
+          setShowSuccessModal(false);
+          navigate("/");
+        }}
+      />
     </div>
   );
 };

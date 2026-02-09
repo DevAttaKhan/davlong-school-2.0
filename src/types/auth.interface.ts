@@ -6,7 +6,7 @@ export interface LoginRequest {
 export interface User {
   email: string;
   id: number;
-  role: "super_admin" | "operator";
+  role: "admin" | "user";
   operator_id: number;
   username: string;
   status: string;
