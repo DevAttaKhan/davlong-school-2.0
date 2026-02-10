@@ -3,19 +3,26 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface UserProfile {
+  contact_number: string;
+  school_name: string;
+  verified_by_admin: boolean;
+  date_of_birth: string | null;
+}
+
 export interface User {
-  email: string;
   id: number;
-  role: "admin" | "user";
-  operator_id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
   username: string;
-  status: string;
-  fullname: string;
-  created_at: string;
-  updated_at: string | null;
+  profile: UserProfile;
+  role: "admin" | "user";
 }
 
 export interface LoginResponse {
-  access_token: string;
+  access: string;
+  refresh: string;
   user: User;
+  message: string;
 }

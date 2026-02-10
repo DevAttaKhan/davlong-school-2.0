@@ -42,9 +42,8 @@ const baseQuery = fetchBaseQuery({
     }
 
     const { token } = (getState() as RootState).auth;
-    if (token) {
-      headers.set("authorization", `Bearer ${token}`);
-    }
+
+    headers.set("authorization", `Bearer ${token}`);
 
     return headers;
   },
@@ -67,7 +66,8 @@ const baseQueryWithReauth: BaseQueryFn<
       api.dispatch(setIsValidToken(false));
 
       const state = api.getState() as RootState;
-      const refreshToken = state.auth.refreshToken;
+      const refreshToken =
+        state.auth.refreshToken || localStorage.getItem("refreshToken");
 
       if (refreshToken) {
         const refreshResult = await baseQuery(
@@ -90,6 +90,17 @@ const baseQueryWithReauth: BaseQueryFn<
         } else if (refreshResult.data) {
           // Refresh succeeded, update tokens
           const refreshData = refreshResult.data as RefreshTokenResponse;
+
+          // Update localStorage
+          localStorage.setItem(
+            "accessToken",
+            refreshData.result.token.access.token
+          );
+          localStorage.setItem(
+            "refreshToken",
+            refreshData.result.token.refresh.token
+          );
+
           api.dispatch(
             setToken({
               token: refreshData.result.token.access.token,

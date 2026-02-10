@@ -43,6 +43,9 @@ const AdminSidebarConfig: SidebarConfig[] = [
     icon: <Mail className="w-5 h-5" />,
     href: "/dashboard/email-templates",
   },
+];
+
+const AdminBottomSidebarConfig: SidebarConfig[] = [
   {
     label: "Settings",
     icon: <Settings className="w-5 h-5" />,
@@ -70,7 +73,19 @@ const UserSidebarConfig: SidebarConfig[] = [
   },
 ];
 
+const UserBottomSidebarConfig: SidebarConfig[] = [
+  {
+    label: "Sign out",
+    icon: <LogOut className="w-5 h-5" />,
+    href: "/logout",
+    dividerBefore: true,
+  },
+];
+
 export type DashboardRole = "admin" | "user";
 
-export const getSidebarConfig = (role: DashboardRole): SidebarConfig[] =>
-  role === "admin" ? AdminSidebarConfig : UserSidebarConfig;
+export const getSidebarConfig = (role: DashboardRole) => {
+  return role === "admin"
+    ? { main: AdminSidebarConfig, bottom: AdminBottomSidebarConfig }
+    : { main: UserSidebarConfig, bottom: UserBottomSidebarConfig };
+};

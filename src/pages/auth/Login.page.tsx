@@ -8,11 +8,8 @@ import { Eye, EyeOff } from "lucide-react";
 import Logo from "@/assets/images/logo.png";
 import { loginSchema, type LoginFormValues } from "./login.schema";
 import { setCredentials } from "@/store/slices/auth.slice";
-import {
-  validateDummyLogin,
-  getDummyUserByRole,
-  DUMMY_CREDENTIALS,
-} from "@/data/dummy-auth";
+import { useLoginMutation } from "@/store/apis/auth.api";
+import { extractApiErrorMessage } from "@/lib/extractApiErrorMessage";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -20,36 +17,49 @@ export const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
+  const [login, { isLoading }] = useLoginMutation();
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: DUMMY_CREDENTIALS.admin.email,
+      email: "",
       password: "",
     },
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const onSubmit = async (formData: LoginFormValues) => {
     setLoginError(null);
-    const role = validateDummyLogin(data.email, data.password);
-    if (!role) {
+    try {
+      const { data, error } = await login(formData);
+
+      if (error) {
+        const errorMessage = extractApiErrorMessage(error);
+        setLoginError(
+          errorMessage || "Login failed. Please check your credentials."
+        );
+        return;
+      }
+
+      if (data) {
+        dispatch(
+          setCredentials({
+            token: data.access,
+            refreshToken: data.refresh,
+            user: data.user,
+          })
+        );
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      const errorMessage = extractApiErrorMessage(error);
       setLoginError(
-        "Invalid email or password. Please check your credentials."
+        errorMessage || "Login failed. Please check your credentials."
       );
-      return;
     }
-    const user = getDummyUserByRole(role);
-    dispatch(
-      setCredentials({
-        token: "mock-token",
-        refreshToken: "mock-refresh",
-        user,
-      })
-    );
-    navigate("/dashboard");
   };
 
   return (
@@ -218,10 +228,10 @@ export const LoginPage = () => {
 
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                   className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white shadow transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70"
                 >
-                  {isSubmitting ? "Signing in…" : "Sign In"}
+                  {isLoading ? "Signing in…" : "Sign In"}
                 </button>
 
                 <div className="text-left">
