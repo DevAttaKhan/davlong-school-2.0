@@ -125,17 +125,11 @@ export const AdminQuotations = () => {
     setSelectedQuotationId(null);
   };
 
-  const handleTabChange = (tab: string) => {
-    setFilters((prev) => ({ ...prev, activeTab: tab, page: 1 }));
-  };
 
-  const handleSearchChange = useCallback((value: string | number) => {
-    setFilters((prev) => ({ ...prev, search: value, page: 1 }));
-  }, []);
+  const handleFilterChange = (key: string, value: string | number) => {
+    setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
 
-  const handleSchoolChange = (school: string) => {
-    setFilters((prev) => ({ ...prev, school: school, page: 1 }));
-  };
+  }
 
   const handlePageChange = (page: number) => {
     setFilters((prev) => ({ ...prev, page: page }));
@@ -149,13 +143,13 @@ export const AdminQuotations = () => {
           <SchoolSelect
             schools={schools}
             selectedSchool={filters.school}
-            onChange={handleSchoolChange}
+            onChange={(value) => handleFilterChange('school', value)}
           />
 
           <div className="w-full sm:w-72">
             <DebouncedInput
               value={filters.search}
-              onChange={handleSearchChange}
+              onChange={(value) => handleFilterChange('search', value)}
               placeholder="Search Trips"
             />
           </div>
@@ -165,7 +159,7 @@ export const AdminQuotations = () => {
           <TableTabs
             tabs={TABS}
             activeTab={filters.activeTab}
-            onTabChange={handleTabChange}
+            onTabChange={(value) => handleFilterChange('activeTab', value)}
           />
         </div>
 
