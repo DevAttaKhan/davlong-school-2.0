@@ -5,6 +5,7 @@ import { DebouncedInput } from "@/components/common/table/DebouncedInput";
 import { columns } from "./columns";
 import { dummyUsers } from "./data";
 import { UserMobileCard } from "./UserMobileCard";
+import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
 
 export const AdminUsersList = () => {
   const [search, setSearch] = useState<string | number>("");
@@ -25,6 +26,12 @@ export const AdminUsersList = () => {
     currentPage * itemsPerPage
   );
 
+  const table = useReactTable({
+    data: paginatedData,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
     <div className="p-4 sm:p-6 space-y-6">
       <div className="w-full">
@@ -36,7 +43,7 @@ export const AdminUsersList = () => {
       </div>
 
       <div className="hidden min-[786px]:block">
-        <DataTable columns={columns} data={paginatedData} />
+        <DataTable table={table} />
       </div>
 
       <div className="block min-[786px]:hidden">

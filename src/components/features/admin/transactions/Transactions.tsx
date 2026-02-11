@@ -10,6 +10,7 @@ import { TransactionMobileCard } from "./TransactionMobileCard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { X, ChevronDown } from "lucide-react";
 import { BottomDrawer } from "@/components/common/BottomDrawer";
+import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
 
 export const AdminTransactions = () => {
   const [search, setSearch] = useState<string | number>("");
@@ -35,6 +36,12 @@ export const AdminTransactions = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const table = useReactTable({
+    data: paginatedData,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   const handleRowClick = (row: Transaction) => {
     setSelectedTransaction(row);
@@ -89,8 +96,7 @@ export const AdminTransactions = () => {
           ) : (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <DataTable
-                columns={columns}
-                data={paginatedData as Transaction[]}
+                table={table}
                 onRowClick={handleRowClick}
               />
             </div>
@@ -106,24 +112,31 @@ export const AdminTransactions = () => {
         </div>
 
         {/* Desktop Detail Panel */}
-        {!isMobile && selectedTransaction && (
-          <div className="w-[600px] shrink-0 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col self-start sticky top-6 max-h-[calc(100vh-100px)] overflow-y-auto">
-            <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50">
-              <h3 className="font-semibold text-gray-900">
-                Transaction Details
-              </h3>
-              <button
-                onClick={closeDetails}
-                className="text-gray-400 hover:text-gray-500 transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="p-4">
-              <TransactionDetails transaction={selectedTransaction} />
-            </div>
-          </div>
-        )}
+        <div
+          className={`shrink-0 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col self-start sticky top-6 max-h-[calc(100vh-100px)] overflow-y-auto transition-all duration-300 ease-in-out ${!isMobile && selectedTransaction
+            ? "w-[600px] opacity-100 translate-x-0"
+            : "w-0 opacity-0 translate-x-10 pointer-events-none hidden"
+            }`}
+        >
+          {selectedTransaction && (
+            <>
+              <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50">
+                <h3 className="font-semibold text-gray-900">
+                  Transaction Details
+                </h3>
+                <button
+                  onClick={closeDetails}
+                  className="text-gray-400 hover:text-gray-500 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="p-4">
+                <TransactionDetails transaction={selectedTransaction} />
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Mobile Bottom Drawer */}

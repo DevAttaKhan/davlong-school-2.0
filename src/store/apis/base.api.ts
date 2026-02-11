@@ -43,7 +43,9 @@ const baseQuery = fetchBaseQuery({
 
     const { token } = (getState() as RootState).auth;
 
-    headers.set("authorization", `Bearer ${token}`);
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
 
     return headers;
   },

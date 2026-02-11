@@ -32,7 +32,7 @@ export const DashboardLayout = () => {
   useEffect(() => {
     try {
       localStorage.setItem(storageKey, String(collapsed));
-    } catch {}
+    } catch { }
   }, [collapsed, storageKey]);
 
   if (!token) {
@@ -60,7 +60,7 @@ export const DashboardLayout = () => {
           collapsed={collapsed}
           setCollapsed={setCollapsed}
         />
-        <main className="flex-1 min-w-0 overflow-auto bg-[#F0F2F4]">
+        <main className="flex-1 min-w-0 overflow-hidden bg-[#F0F2F4]">
           <Outlet />
         </main>
       </div>

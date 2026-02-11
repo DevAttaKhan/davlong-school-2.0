@@ -5,6 +5,7 @@ import { columns } from "./columns";
 import { dummyTransactions } from "./data";
 import { ChevronDown } from "lucide-react";
 import { DashboardMobileCard } from "./DashboardMobileCard";
+import { useReactTable, getCoreRowModel } from "@tanstack/react-table";
 
 export const UserDashboard = () => {
   const [search, setSearch] = useState<string | number>("");
@@ -17,6 +18,12 @@ export const UserDashboard = () => {
       item.from.toLowerCase().includes(String(search).toLowerCase()) ||
       item.to.toLowerCase().includes(String(search).toLowerCase())
     );
+  });
+
+  const table = useReactTable({
+    data: filteredData,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
   });
 
   return (
@@ -47,8 +54,7 @@ export const UserDashboard = () => {
                I'll use the DataTable.
            */}
           <DataTable
-            columns={columns}
-            data={filteredData}
+            table={table}
             className="border-none"
           />
         </div>

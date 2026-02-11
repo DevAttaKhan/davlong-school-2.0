@@ -1,15 +1,16 @@
-import { AppFalbackWrapper } from "@/components/common/AppFalbackWrapper";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 import { AdminQuotations } from "@/components/features/admin/quotations/Quotations";
-import { Loading } from "./loading";
-import { Error } from "./error";
+import { UserQuotations } from "@/components/features/user/quotations/UserQuotations";
 
-export const QuotationsPage = () => (
-  <AppFalbackWrapper
-    isLoading={false}
-    isError={false}
-    LoadingComponent={<Loading />}
-    ErrorComponent={<Error />}
-  >
-    <AdminQuotations />
-  </AppFalbackWrapper>
-);
+
+
+export const QuotationsPage = () => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+
+
+  if (role === 'admin') return <AdminQuotations />
+  if (role === 'user') return <UserQuotations />
+
+
+}

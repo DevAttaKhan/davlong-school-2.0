@@ -1,40 +1,21 @@
 import {
-  type ColumnDef,
   flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getSortedRowModel,
-  type SortingState,
+  type Table,
 } from "@tanstack/react-table";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface DataTableProps<TData> {
+  table: Table<TData>;
   className?: string;
   onRowClick?: (row: TData) => void;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
+export function DataTable<TData>({
+  table,
   className,
   onRowClick,
-}: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    state: {
-      sorting,
-    },
-  });
-
+}: DataTableProps<TData>) {
   return (
     <div
       className={cn(
@@ -48,17 +29,30 @@ export function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
+                  const isSorted = header.column.getIsSorted();
                   return (
                     <th
                       key={header.id}
-                      className="px-6 py-3 font-medium whitespace-nowrap"
+                      className={cn(
+                        "px-6 py-3 font-medium whitespace-nowrap select-none",
+                        header.column.getCanSort() && "cursor-pointer hover:bg-gray-100"
+                      )}
+                      onClick={header.column.getToggleSortingHandler()}
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
+                      <div className="flex items-center gap-2">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
                             header.column.columnDef.header,
                             header.getContext()
                           )}
+                        {{
+                          asc: <ArrowUp className="h-4 w-4" />,
+                          desc: <ArrowDown className="h-4 w-4" />,
+                        }[isSorted as string] ?? (
+                            <ArrowUpDown className="h-4 w-4 text-gray-300" />
+                          )}
+                      </div>
                     </th>
                   );
                 })}
@@ -89,7 +83,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <tr>
                 <td
-                  colSpan={columns.length}
+                  colSpan={table.getAllColumns().length}
                   className="h-24 text-center text-gray-500"
                 >
                   No results.
